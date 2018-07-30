@@ -1,1 +1,1 @@
-web: amplify-api
+web: ipify-api
