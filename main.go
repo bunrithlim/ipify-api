@@ -23,16 +23,8 @@ func main() {
 	// Setup all routes.  We only service API requests, so this is basic.
 	router := httprouter.New()
 
-	// Requester related features
-	router.GET("/who", api.GetRequestInfo)
-
 	// IP related features
 	router.GET("/ip", api.GetIP)
-
-	// Time related features
-	router.GET("/utc", api.GetTimeUTC)
-	router.GET("/utc/milli", api.GetTimeUTCMilli)
-	router.GET("/utc/nano", api.GetTimeUTCNano)
 
 	// Setup 404 / 405 handlers.
 	router.NotFound = http.HandlerFunc(api.NotFound)
