@@ -1,15 +1,16 @@
-// ipify-api
+// Amplify-api
 //
 // This is the main package which starts up and runs our REST API service.
 //
-// ipify is a simple API service which returns a user's public IP address (it
-// supports handling both IPv4 and IPv6 addresses).
+// Amplify is a simple API service which returns a user's public IP address (it
+// supports handling both IPv4 and IPv6 addresses), and the UTC time as Unix
+// seconds.
 
 package main
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/rdegges/ipify-api/api"
+	"github.com/bunrithlim/ipify-api/api"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
@@ -21,7 +22,17 @@ func main() {
 
 	// Setup all routes.  We only service API requests, so this is basic.
 	router := httprouter.New()
-	router.GET("/", api.GetIP)
+
+	// Requester related features
+	router.GET("/who", api.GetRequestInfo)
+
+	// IP related features
+	router.GET("/ip", api.GetIP)
+
+	// Time related features
+	router.GET("/utc", api.GetTimeUTC)
+	router.GET("/utc/milli", api.GetTimeUTCMilli)
+	router.GET("/utc/nano", api.GetTimeUTCNano)
 
 	// Setup 404 / 405 handlers.
 	router.NotFound = http.HandlerFunc(api.NotFound)

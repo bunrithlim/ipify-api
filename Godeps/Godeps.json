@@ -1,7 +1,7 @@
 {
-	"ImportPath": "github.com/rdegges/ipify-api",
+	"ImportPath": "github.com/bunrithlim/ipify-api",
 	"GoVersion": "go1.8",
-	"GodepVersion": "v79",
+	"GodepVersion": "v80",
 	"Deps": [
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",

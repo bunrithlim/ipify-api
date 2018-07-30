@@ -19,7 +19,7 @@ import (
 //
 // By default, it will return the IP address in plain text, but can also return
 // data in both JSON and JSONP if requested to.
-func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func GetRequestInfo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	err := r.ParseForm()
 	if err != nil {
@@ -31,11 +31,15 @@ func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// is the *true* IP of the user.  For more information on this, see the
 	// Wikipedia page: https://en.wikipedia.org/wiki/X-Forwarded-For
 	ip := net.ParseIP(strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0]).String()
+	ua := r.UserAgent()
+	rf := r.Referer()
 
+    _all := fmt.Sprintf("%s - %s - %s", ua, rf, ip)
+    
 	// If the user specifies a 'format' querystring, we'll try to return the
 	// user's IP address in the specified format.
 	if format, ok := r.Form["format"]; ok && len(format) > 0 {
-		jsonStr, _ := json.Marshal(models.IPAddress{ip})
+		jsonStr, _ := json.Marshal(models.RequestInfo{ip, ua, rf})
 
 		switch format[0] {
 		case "json":
@@ -59,5 +63,5 @@ func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// If no 'format' querystring was specified, we'll default to returning the
 	// IP in plain text.
 	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprintf(w, ip)
+	fmt.Fprintf(w, _all)
 }

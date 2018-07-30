@@ -10,16 +10,36 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/bunrithlim/ipify-api/models"
-	"net"
 	"net/http"
-	"strings"
+	//"strings"
+	"time"
 )
 
-// GetIP returns a user's public facing IP address (IPv4 OR IPv6).
-//
-// By default, it will return the IP address in plain text, but can also return
-// data in both JSON and JSONP if requested to.
-func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func GetTimeUTCNano(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+
+    tm := fmt.Sprintf("%d", time.Now().UnixNano())
+
+    FormatTimeUTCResponse(w, r, tm);
+}
+
+func GetTimeUTCMilli(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+	
+    tm := fmt.Sprintf("%d", time.Now().UnixNano() / int64(time.Millisecond))
+
+    FormatTimeUTCResponse(w, r, tm);
+}
+
+func GetTimeUTC(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	err := r.ParseForm()
 	if err != nil {
@@ -30,12 +50,18 @@ func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// list.  We do this because this is always the *origin* IP address, which
 	// is the *true* IP of the user.  For more information on this, see the
 	// Wikipedia page: https://en.wikipedia.org/wiki/X-Forwarded-For
-	ip := net.ParseIP(strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0]).String()
+    tm := fmt.Sprintf("%d", time.Now().Unix())
+
+    FormatTimeUTCResponse(w, r, tm);
+}
+
+func FormatTimeUTCResponse(w http.ResponseWriter, r *http.Request, tm string) {
 
 	// If the user specifies a 'format' querystring, we'll try to return the
 	// user's IP address in the specified format.
+	
 	if format, ok := r.Form["format"]; ok && len(format) > 0 {
-		jsonStr, _ := json.Marshal(models.IPAddress{ip})
+		jsonStr, _ := json.Marshal(models.TimeUTC{tm})
 
 		switch format[0] {
 		case "json":
@@ -56,8 +82,8 @@ func GetIP(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		}
 	}
 
-	// If no 'format' querystring was specified, we'll default to returning the
-	// IP in plain text.
+	// If no 'format' querystring was specified, we'll default to returning
+	// results in plain text.
 	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprintf(w, ip)
+	fmt.Fprint(w, tm)
 }
